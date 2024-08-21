@@ -1,52 +1,101 @@
+# Compound Component Pattern in React
 
-# React + TypeScript + Vite
+This repository demonstrates the implementation of the Compound Component Pattern in React.js. The pattern is ideal for building flexible and reusable components by allowing child components to communicate with a parent component through context.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Structure
 
-Currently, two official plugins are available:
+```plaintext
+src/
+├── components/
+│   ├── card-post.tsx  # The main component and its subcomponents
+├── context/
+│   ├── usePostCardContext.tsx  # Context for the PostCard component
+├── hooks/
+│   ├── usePostCardContext.tsx  # Custom hook to use the PostCard context
+├── types/
+│   ├── index.tsx  # Type definitions for the PostCard component
+├── App.tsx  # Entry point of the React application
+├── index.css  # Tailwind CSS customizations
+```
+## How It Works
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### PostCard Component
 
-## Expanding the ESLint configuration
+The `PostCard` component is the main parent component. It uses the Compound Component Pattern to pass down context to its children (`PostCard.Title`, `PostCard.Content`, `PostCard.Author`, `PostCard.Buttons`).
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```tsx
+export const PostCard = ({ children, post }: postCardProps) => {
+    return (
+        <postCardContext.Provider value={{ post }}>
+            <div className="flex flex-col gap-10 w-2/6 rounded-lg shadow-xl bg-gray-100 p-4">
+                {children}
+            </div>
+        </postCardContext.Provider>
+    );
+};
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Child Components
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Each child component (`PostCard.Title`, `PostCard.Content`, `PostCard.Author`, `PostCard.Buttons`) consumes the context provided by the `PostCard` component using a custom hook `usePostCardContext`.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+For example, the `PostCard.Title` component:
+
+```tsx
+PostCard.Title = function PostCardTitle({ className }: { className?: string }) {
+    const { post } = usePostCardContext();
+    return (
+        <p className={twMerge("font-semibold text-blue-950", className)}>
+            {post.postTitle}
+        </p>
+    );
+};
 ```
 
+### Usage
+
+To use the `PostCard` component, you can import it into your application and pass the necessary `post` object and its children:
+
+```tsx
+import { PostCard } from "./components/card-post";
+
+function App() {
+    return (
+        <div className="w-full h-full flex p-20">
+            <PostCard
+                post={{
+                    postTitle: "This is a Title",
+                    postContent: "This is the content of this post",
+                    postAuthor: "Author Name",
+                }}
+            >
+                <PostCard.Title />
+                <PostCard.Content />
+                <PostCard.Author />
+                <PostCard.Buttons />
+            </PostCard>
+        </div>
+    );
+}
+
+export default App;
+```
+
+### Instalation
+1. Clone the repository:
+```bash
+git clone https://github.com/AboubakreSenouci/compound-component-design-pattern.git
+```
+2. Navigate to the project directory:
+```bash
+cd compound-component-design-pattern
+```
+3. Install the dependencies:
+```bash
+npm install
+```
+4. Start the development server:
+```bash
+   npm run dev
+   ```
+   
